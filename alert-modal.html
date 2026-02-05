@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>알림 모달</title>
+  <style>
+    /* ========== 알림 모달 스타일 (다른 파일에 합칠 때 이 블록만 복사) ========== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .modal-overlay.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .modal {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 16px;
+      background: #fff;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid #eee;
+      background: #F8FCF2;
+    }
+    .modal-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #222;
+    }
+    .modal-close {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .modal-close img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .modal-close:hover {
+      background: #e8e8e8;
+    }
+    .modal-close:hover img {
+      opacity: 0.85;
+    }
+    .modal-body {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 30px 20px 30px;
+    }
+    .modal-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .modal-message {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #333;
+    }
+    .modal-message strong {
+      color: #c62828;
+      font-weight: 600;
+    }
+    .modal-footer {
+      padding: 15px 15px;
+      display: flex;
+      justify-content: center;
+      border-top: 1px solid #e0e0e0;
+    }
+    .modal-confirm {
+      width: 85px;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #1EA5B7;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .modal-confirm:hover {
+      background: #208c82;
+    }
+    .modal-confirm:active {
+      background: #1a7269;
+    }
+    /* ========== 알림 모달 스타일 끝 ========== */
+  </style>
+</head>
+<body>
+  <!-- ========== 알림 모달 HTML (다른 파일에 합칠 때 이 블록만 복사, body 끝나기 직전에 넣기) ========== -->
+  <div class="modal-overlay is-hidden" id="alert-modal-overlay" role="dialog" aria-labelledby="alert-modal-title" aria-modal="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="alert-modal-title">알림(Notice)</h2>
+        <button type="button" class="modal-close" id="alert-modal-close" aria-label="닫기"><img src="xbt.png" alt="" /></button>
+      </div>
+      <div class="modal-body">
+        <span class="modal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="12,3 21,20 3,20" fill="#e53935" stroke="#e53935" stroke-width="2" stroke-linejoin="round"/>
+            <text x="12" y="14" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">!</text>
+          </svg>
+        </span>
+        <p class="modal-message">
+          본 교과목은 <strong>[수강정원제한]</strong>에 도달하셨습니다.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-confirm" id="alert-modal-confirm">확인</button>
+      </div>
+    </div>
+  </div>
+  <!-- ========== 알림 모달 HTML 끝 ========== -->
+
+  <!-- ========== 알림 모달 스크립트 (다른 파일에 합칠 때 이 블록만 복사) ========== -->
+  <script>
+  (function () {
+    var overlay = document.getElementById("alert-modal-overlay");
+    var closeBtn = document.getElementById("alert-modal-close");
+    var confirmBtn = document.getElementById("alert-modal-confirm");
+
+    function closeAlertModal() {
+      overlay.classList.add("is-hidden");
+    }
+    function showAlertModal() {
+      overlay.classList.remove("is-hidden");
+      if (closeBtn) closeBtn.focus();
+    }
+
+    if (closeBtn) closeBtn.addEventListener("click", closeAlertModal);
+    if (confirmBtn) confirmBtn.addEventListener("click", closeAlertModal);
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) closeAlertModal();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && overlay && !overlay.classList.contains("is-hidden")) {
+        closeAlertModal();
+      }
+    });
+
+    window.showAlertModal = showAlertModal;
+    window.closeAlertModal = closeAlertModal;
+  })();
+  </script>
+  <!-- ========== 알림 모달 스크립트 끝 ========== -->
+</body>
+</html>

@@ -1,0 +1,246 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* popup.html 고정: popup.png 크기 유지(754×576), 잘리지 않음. 우측 상단에서 좌·하단으로 약간 이동 */
+.popup-frame-wrapper {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  width: 754px;
+  height: 576px;
+  z-index: 9999;
+  pointer-events: auto;
+  overflow: visible;
+}
+
+.popup-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 754px;
+  min-height: 576px;
+  border: none;
+}
+
+/* Enter 버튼 레이어: 팝업(9999)보다 위에 두어 클릭·hover 가능, 레이어 자체는 클릭 통과 */
+.enter-buttons-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.enter-buttons-layer .enter-btn {
+  pointer-events: auto;
+}
+
+body {
+  min-height: 100vh;
+  background-image: url('background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+a {
+  color: #1346FF;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Container: 1331 × 439.33 aspect ratio, positioned by script (--list-*) */
+.table-container {
+  position: fixed;
+  left: var(--list-left, 9.92%);
+  top: var(--list-top, 26.98%);
+  width: var(--list-width, 86vw);
+  aspect-ratio: 1331 / 439.33;
+  z-index: 1;
+}
+
+.list-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Enter button: SVG 참고 (66.5×33.67, rx 6.73447, #1EA5B7), Pretendard */
+/* 7 rows: 버튼 간 간격 12.2%. 첫 번째 고정, 나머지 동일 left */
+.enter-btn {
+  position: absolute;
+  left: 2.6%;
+  top: 16.84%;
+  width: 80.47px;
+  height: 40.74px;
+  padding: 0;
+  border: none;
+  border-radius: 8.15px;
+  background-color: #1EA5B7;
+  color: white;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 살짝이라도 닿으면 hover 인식되도록 히트 영역 확대 (보이지 않는 영역) */
+.enter-btn::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+}
+
+.enter-btn:hover,
+.enter-btn:active {
+  background-color: #72CB23 !important;
+  background: #72CB23 !important;
+}
+
+/* Rows 2–7: 같은 가로 위치, 세로 간격 12.2% */
+.enter-btn:nth-child(3) { top: 29.04%; }  /* 16.84 + 12.2 */
+.enter-btn:nth-child(4) { top: 41.24%; }
+.enter-btn:nth-child(5) { top: 53.44%; }
+.enter-btn:nth-child(6) { top: 65.64%; }
+.enter-btn:nth-child(7) { top: 77.84%; }
+.enter-btn:nth-child(8) { top: 90.04%; }
+
+.content {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== 알림 모달 (화면 중앙 표시, Enter 버튼 클릭 시) ========== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.modal-overlay.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 16px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transform: scale(1.2);
+  transform-origin: center center;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #eee;
+  background: #F8FCF2;
+}
+.modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+.modal-close {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, opacity 0.15s;
+}
+.modal-close img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.modal-close:hover {
+  background: #e8e8e8;
+}
+.modal-close:hover img {
+  opacity: 0.85;
+}
+.modal-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 30px 20px 30px;
+}
+.modal-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.modal-message {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #333;
+}
+.modal-message strong {
+  color: #c62828;
+  font-weight: 600;
+}
+.modal-footer {
+  padding: 15px 15px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #e0e0e0;
+}
+.modal-confirm {
+  width: 85px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #1EA5B7;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-confirm:hover {
+  background: #208c82;
+}
+.modal-confirm:active {
+  background: #1a7269;
+}
