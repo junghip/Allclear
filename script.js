@@ -1,60 +1,137 @@
-// 배경 이미지(background.png) 기준으로 list.png 위치·크기 계산 (cover + center 반영)
+// 기준 해상도 1920×1080, 실제 화면에 맞춰 스케일만 적용 (로컬/배포 동일)
+(function() {
+  var DESIGN_W = 1920;
+  var DESIGN_H = 1080;
+  var viewportEl = null;
+
+  function updateScale() {
+    var s = Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H);
+    var back = document.getElementById('design-viewport-back');
+    var front = document.getElementById('design-viewport-front');
+    if (back) back.style.transform = 'scale(' + s + ')';
+    if (front) front.style.transform = 'scale(' + s + ')';
+  }
+
+  window.addEventListener('resize', function() {
+    updateScale();
+    if (window.updateListScreenPosition) requestAnimationFrame(window.updateListScreenPosition);
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    updateScale();
+    if (window.updateListScreenPosition) requestAnimationFrame(window.updateListScreenPosition);
+  });
+})();
+
+// 배경 이미지 기준 list 위치·크기 (1920×1080 고정 px)
 (function() {
   var bgImg = new Image();
   bgImg.src = 'background.png';
+  var DESIGN_W = 1920;
+  var DESIGN_H = 1080;
 
   function setListPosition() {
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
+    var vw = DESIGN_W;
+    var vh = DESIGN_H;
     var bgW = bgImg.naturalWidth;
     var bgH = bgImg.naturalHeight;
     if (!bgW || !bgH) return;
 
-    // background-size: cover → scale = max(vw/bgW, vh/bgH)
     var scale = Math.max(vw / bgW, vh / bgH);
     var scaledW = bgW * scale;
     var scaledH = bgH * scale;
-    // background-position: center
     var offsetX = (vw - scaledW) / 2;
     var offsetY = (vh - scaledH) / 2;
 
-    // 배경 이미지 기준 가로 9.92%, 세로 26.98% 위치 (px)
     var listLeft = offsetX + scaledW * 0.0992;
     var listTop = offsetY + scaledH * 0.2698;
-    // 배경 이미지 가로의 88.03%
     var listWidth = scaledW * 0.8803;
 
     document.documentElement.style.setProperty('--list-left', listLeft + 'px');
     document.documentElement.style.setProperty('--list-top', listTop + 'px');
     document.documentElement.style.setProperty('--list-width', listWidth + 'px');
+    if (window.updateListScreenPosition) setTimeout(window.updateListScreenPosition, 0);
   }
 
-  bgImg.onload = function() {
-    setListPosition();
-    window.addEventListener('resize', setListPosition);
-  };
-  if (bgImg.complete) {
-    setListPosition();
-    window.addEventListener('resize', setListPosition);
-  }
+  bgImg.onload = function() { setListPosition(); };
+  if (bgImg.complete) setListPosition();
 })();
 
-// Enter 버튼: 제자리 있다가 마우스 가까이 오면 이동, 화면 전체에서 튕김. z축은 popup 위에 표시
+// list.png: 스케일 밖 고정 레이어에 배치, 로드·위치 확정 후 표시 → 첫 프레임부터 선명
 (function() {
+  function setReady() {
+    var wrap = document.getElementById('list-image-screen');
+    if (wrap) wrap.classList.add('is-ready');
+  }
+  function updateListScreenPosition() {
+    var container = document.querySelector('.table-container');
+    var wrap = document.getElementById('list-image-screen');
+    var img = wrap && wrap.querySelector('img');
+    if (!container || !wrap) return;
+    var r = container.getBoundingClientRect();
+    wrap.style.left = r.left + 'px';
+    wrap.style.top = r.top + 'px';
+    wrap.style.width = r.width + 'px';
+    wrap.style.height = r.height + 'px';
+    if (r.width > 0 && r.height > 0 && img && img.complete && img.naturalWidth) setReady();
+  }
+  window.updateListScreenPosition = updateListScreenPosition;
+  window.addEventListener('resize', function() {
+    requestAnimationFrame(updateListScreenPosition);
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    var img = document.querySelector('#list-image-screen img');
+    if (img) {
+      img.addEventListener('load', function onLoad() {
+        img.removeEventListener('load', onLoad);
+        requestAnimationFrame(function() {
+          updateListScreenPosition();
+          setReady();
+        });
+      });
+      if (img.complete && img.naturalWidth) {
+        requestAnimationFrame(function() {
+          updateListScreenPosition();
+          setReady();
+        });
+      }
+    }
+    requestAnimationFrame(function() {
+      updateListScreenPosition();
+      setTimeout(updateListScreenPosition, 50);
+      setTimeout(updateListScreenPosition, 200);
+    });
+  });
+})();
+
+// Enter 버튼: 1920×1080 설계 좌표, 마우스는 화면→설계 변환
+(function() {
+  var DESIGN_W = 1920;
+  var DESIGN_H = 1080;
   var SPEED_MIN = 5;
   var SPEED_MAX = 11;
   var ACTIVATE_RADIUS = 200;
   var FLEE_RADIUS = 260;
   var FLEE_STRENGTH = 3.5;
   var MAX_SPEED = 16;
-  var mouseX = -1e5;
-  var mouseY = -1e5;
+  var mouseScreenX = -1e5;
+  var mouseScreenY = -1e5;
   var buttons = [];
   var rafId = null;
+  var viewportEl = null;
 
   function randomSpeed() {
     var v = SPEED_MIN + Math.random() * (SPEED_MAX - SPEED_MIN);
     return Math.random() < 0.5 ? -v : v;
+  }
+
+  function screenToDesign(sx, sy) {
+    if (!viewportEl) viewportEl = document.getElementById('design-viewport-front');
+    if (!viewportEl) return { x: sx, y: sy };
+    var r = viewportEl.getBoundingClientRect();
+    return {
+      x: (sx - r.left) * DESIGN_W / r.width,
+      y: (sy - r.top) * DESIGN_H / r.height
+    };
   }
 
   function initButtons() {
@@ -62,14 +139,21 @@
     if (!list.length) return;
     var layer = document.querySelector('.enter-buttons-layer');
     if (!layer) return;
+    viewportEl = document.getElementById('design-viewport-front');
+    if (!viewportEl) return;
+    var vr = viewportEl.getBoundingClientRect();
+    var scale = vr.width / DESIGN_W;
     buttons = [];
-    // 레이아웃이 바뀌지 않은 상태에서 7개 위치를 먼저 수집
     var positions = [];
     for (var i = 0; i < list.length; i++) {
-      var r = list[i].getBoundingClientRect();
-      positions.push({ left: r.left, top: r.top, width: r.width, height: r.height });
+      var br = list[i].getBoundingClientRect();
+      positions.push({
+        left: (br.left - vr.left) / scale,
+        top: (br.top - vr.top) / scale,
+        width: br.width / scale,
+        height: br.height / scale
+      });
     }
-    // 그 다음 버튼을 레이어로 옮기고 수집한 위치 적용
     for (var j = 0; j < list.length; j++) {
       var btn = list[j];
       var pos = positions[j];
@@ -83,7 +167,7 @@
         vy: 0
       });
       layer.appendChild(btn);
-      btn.style.position = 'fixed';
+      btn.style.position = 'absolute';
       btn.style.left = pos.left + 'px';
       btn.style.top = pos.top + 'px';
       btn.style.right = 'auto';
@@ -93,8 +177,11 @@
   }
 
   function tick() {
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
+    var d = screenToDesign(mouseScreenX, mouseScreenY);
+    var mouseX = d.x;
+    var mouseY = d.y;
+    var vw = DESIGN_W;
+    var vh = DESIGN_H;
     buttons.forEach(function(b) {
       var cx = b.x + b.w / 2;
       var cy = b.y + b.h / 2;
@@ -137,12 +224,12 @@
       initButtons();
       if (buttons.length) {
         document.addEventListener('mousemove', function(e) {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
+          mouseScreenX = e.clientX;
+          mouseScreenY = e.clientY;
         });
         rafId = requestAnimationFrame(tick);
       }
-    }, 200);
+    }, 250);
   });
 })();
 

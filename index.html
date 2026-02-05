@@ -6,48 +6,55 @@
   <title>::이화여자대학교 수강신청 시스템::</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="style.css">
+  <!-- 첫 화면 품질 개선: list/background 미리 로드 -->
+  <link rel="preload" href="list.png" as="image">
+  <link rel="preload" href="background.png" as="image">
 </head>
 <body>
-  <!-- popup.html 고정 표시 (우측 상단, 삭제/이동 없음) -->
-  <div class="popup-frame-wrapper">
-    <iframe src="popup.html" class="popup-frame" title="팝업"></iframe>
+  <!-- 1920×1080 고정: back(배경만 스케일) → list는 화면 픽셀로 그려서 항상 선명 → front(나머지 스케일) -->
+  <div id="design-viewport-back" class="design-viewport-scaled">
+    <div class="design-bg" aria-hidden="true"></div>
   </div>
-  <!-- Enter 버튼 전용 레이어: 팝업보다 위에 그려져서 클릭·hover 가능 -->
-  <div class="enter-buttons-layer"></div>
-  <div class="table-container" aria-hidden="true">
-    <img src="list.png" alt="" class="list-image" role="presentation">
-    <button type="button" class="enter-btn">Enter</button>
-    <button type="button" class="enter-btn">Enter</button>
-    <button type="button" class="enter-btn">Enter</button>
-    <button type="button" class="enter-btn">Enter</button>
-    <button type="button" class="enter-btn">Enter</button>
-    <button type="button" class="enter-btn">Enter</button>
-    <button type="button" class="enter-btn">Enter</button>
+  <div id="list-image-screen" class="list-image-screen" aria-hidden="true">
+    <img src="list.png" alt="" loading="eager" fetchpriority="high" decoding="sync">
   </div>
-  <div class="content">
-    <!-- 여기에 웹사이트 내용을 추가하세요 -->
-  </div>
+  <div id="design-viewport-front" class="design-viewport-scaled">
+    <div class="popup-frame-wrapper">
+      <iframe src="popup.html" class="popup-frame" title="팝업"></iframe>
+    </div>
+    <div class="enter-buttons-layer"></div>
+    <div class="table-container" aria-hidden="true">
+      <button type="button" class="enter-btn">Enter</button>
+      <button type="button" class="enter-btn">Enter</button>
+      <button type="button" class="enter-btn">Enter</button>
+      <button type="button" class="enter-btn">Enter</button>
+      <button type="button" class="enter-btn">Enter</button>
+      <button type="button" class="enter-btn">Enter</button>
+      <button type="button" class="enter-btn">Enter</button>
+    </div>
+    <div class="content"></div>
 
-  <!-- 알림 모달: Enter 버튼 클릭 시 화면 중앙에 표시 -->
-  <div class="modal-overlay is-hidden" id="alert-modal-overlay" role="dialog" aria-labelledby="alert-modal-title" aria-modal="true">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 class="modal-title" id="alert-modal-title">알림(Notice)</h2>
-        <button type="button" class="modal-close" id="alert-modal-close" aria-label="닫기"><img src="xbt.png" alt="" /></button>
-      </div>
-      <div class="modal-body">
-        <span class="modal-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="12,3 21,20 3,20" fill="#e53935" stroke="#e53935" stroke-width="2" stroke-linejoin="round"/>
-            <text x="12" y="14" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">!</text>
-          </svg>
-        </span>
-        <p class="modal-message">
-          본 교과목은 <strong>[수강정원제한]</strong>에 도달하셨습니다.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="modal-confirm" id="alert-modal-confirm">확인</button>
+    <!-- 알림 모달: design-viewport 안에 두어 스케일 적용 → 로컬/배포 동일 크기 -->
+    <div class="modal-overlay is-hidden" id="alert-modal-overlay" role="dialog" aria-labelledby="alert-modal-title" aria-modal="true">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="alert-modal-title">알림(Notice)</h2>
+          <button type="button" class="modal-close" id="alert-modal-close" aria-label="닫기"><img src="xbt.png" alt="" /></button>
+        </div>
+        <div class="modal-body">
+          <span class="modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="12,3 21,20 3,20" fill="#e53935" stroke="#e53935" stroke-width="2" stroke-linejoin="round"/>
+              <text x="12" y="14" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central">!</text>
+            </svg>
+          </span>
+          <p class="modal-message">
+            본 교과목은 <strong>[수강정원제한]</strong>에 도달하셨습니다.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-confirm" id="alert-modal-confirm">확인</button>
+        </div>
       </div>
     </div>
   </div>

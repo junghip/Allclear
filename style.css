@@ -4,9 +4,75 @@
   box-sizing: border-box;
 }
 
-/* popup.html 고정: popup.png 크기 유지(754×576), 잘리지 않음. 우측 상단에서 좌·하단으로 약간 이동 */
-.popup-frame-wrapper {
+/* 1920×1080 고정, 스케일만 적용 (back=배경, front=팝업·버튼·모달) */
+.design-viewport-scaled {
   position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  margin-left: -960px;
+  margin-top: -540px;
+  transform-origin: center center;
+  z-index: 0;
+}
+#design-viewport-front {
+  z-index: 2;
+  pointer-events: none;
+}
+#design-viewport-front .popup-frame-wrapper,
+#design-viewport-front .enter-buttons-layer,
+#design-viewport-front .modal-overlay {
+  pointer-events: auto;
+}
+
+/* list.png: 스케일 밖에서 화면 픽셀 그대로 → 고해상도 레이어로 첫 프레임부터 선명 (JS에서 left/top/width/height 설정) */
+.list-image-screen {
+  position: fixed;
+  z-index: 1;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.list-image-screen img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+}
+.list-image-screen.is-ready img {
+  opacity: 1;
+}
+
+.design-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body {
+  min-height: 100vh;
+  background: #fff;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* popup: 1920×1080 내 고정 px */
+.popup-frame-wrapper {
+  position: absolute;
   top: 24px;
   right: 32px;
   width: 754px;
@@ -20,15 +86,16 @@
   display: block;
   width: 100%;
   height: 100%;
-  min-width: 754px;
-  min-height: 576px;
   border: none;
 }
 
-/* Enter 버튼 레이어: 팝업(9999)보다 위에 두어 클릭·hover 가능, 레이어 자체는 클릭 통과 */
+/* Enter 버튼 레이어: 1920×1080 전체, 버튼은 absolute px */
 .enter-buttons-layer {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
   z-index: 10000;
   pointer-events: none;
 }
@@ -37,40 +104,20 @@
   pointer-events: auto;
 }
 
-body {
-  min-height: 100vh;
-  background-image: url('background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-}
-
 a {
   color: #1346FF;
   font-weight: 600;
   text-decoration: underline;
 }
 
-/* Container: 1331 × 439.33 aspect ratio, positioned by script (--list-*) */
+/* Container: 1920×1080 기준 px, script에서 --list-* 설정 */
 .table-container {
-  position: fixed;
-  left: var(--list-left, 9.92%);
-  top: var(--list-top, 26.98%);
-  width: var(--list-width, 86vw);
+  position: absolute;
+  left: var(--list-left, 0);
+  top: var(--list-top, 0);
+  width: var(--list-width, 800px);
   aspect-ratio: 1331 / 439.33;
   z-index: 1;
-}
-
-.list-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  pointer-events: none;
 }
 
 /* Enter button: SVG 참고 (66.5×33.67, rx 6.73447, #1EA5B7), Pretendard */
@@ -109,24 +156,31 @@ a {
   background: #72CB23 !important;
 }
 
-/* Rows 2–7: 같은 가로 위치, 세로 간격 12.2% */
-.enter-btn:nth-child(3) { top: 29.04%; }  /* 16.84 + 12.2 */
-.enter-btn:nth-child(4) { top: 41.24%; }
-.enter-btn:nth-child(5) { top: 53.44%; }
-.enter-btn:nth-child(6) { top: 65.64%; }
-.enter-btn:nth-child(7) { top: 77.84%; }
-.enter-btn:nth-child(8) { top: 90.04%; }
+/* Rows 2–7: 같은 가로 위치, 세로 간격 12.2% (1번은 기본 16.84%) */
+.enter-btn:nth-child(2) { top: 29.04%; }
+.enter-btn:nth-child(3) { top: 41.24%; }
+.enter-btn:nth-child(4) { top: 53.44%; }
+.enter-btn:nth-child(5) { top: 65.64%; }
+.enter-btn:nth-child(6) { top: 77.84%; }
+.enter-btn:nth-child(7) { top: 90.04%; }
 
 .content {
-  min-height: 100vh;
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
   z-index: 1;
+  pointer-events: none;
 }
 
-/* ========== 알림 모달 (화면 중앙 표시, Enter 버튼 클릭 시) ========== */
+/* ========== 알림 모달 (1920×1080 내 절대 위치, design-viewport와 함께 스케일 → 로컬/배포 동일) ========== */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
