@@ -1,4 +1,3 @@
-// 기준 해상도 1920×1080, 실제 화면에 맞춰 스케일만 적용 (로컬/배포 동일)
 (function() {
   var DESIGN_W = 1920;
   var DESIGN_H = 1080;
@@ -22,7 +21,6 @@
   });
 })();
 
-// 배경 이미지 기준 list 위치·크기 (1920×1080 고정 px)
 (function() {
   var bgImg = new Image();
   bgImg.src = 'background.png?v=2';
@@ -50,13 +48,13 @@
     document.documentElement.style.setProperty('--list-top', listTop + 'px');
     document.documentElement.style.setProperty('--list-width', listWidth + 'px');
     if (window.updateListScreenPosition) setTimeout(window.updateListScreenPosition, 0);
+    if (window.scheduleEnterButtonsInit) window.scheduleEnterButtonsInit();
   }
 
   bgImg.onload = function() { setListPosition(); };
   if (bgImg.complete) setListPosition();
 })();
 
-// list.png: 스케일 밖 고정 레이어에 배치, 로드·위치 확정 후 표시 → 첫 프레임부터 선명
 (function() {
   function setReady() {
     var wrap = document.getElementById('list-image-screen');
@@ -103,7 +101,6 @@
   });
 })();
 
-// Enter 버튼: 1920×1080 설계 좌표, 마우스는 화면→설계 변환
 (function() {
   var DESIGN_W = 1920;
   var DESIGN_H = 1080;
@@ -221,22 +218,30 @@
     rafId = requestAnimationFrame(tick);
   }
 
+  var buttonsInitialized = false;
+  function runInitButtons() {
+    if (buttonsInitialized) return;
+    initButtons();
+    buttonsInitialized = true;
+    if (buttons.length) {
+      document.addEventListener('mousemove', function(e) {
+        mouseScreenX = e.clientX;
+        mouseScreenY = e.clientY;
+      });
+      rafId = requestAnimationFrame(tick);
+    }
+  }
+  window.scheduleEnterButtonsInit = function() {
+    requestAnimationFrame(function() {
+      requestAnimationFrame(runInitButtons);
+    });
+  };
+
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('올클기원 웹사이트 로드됨');
-    setTimeout(function() {
-      initButtons();
-      if (buttons.length) {
-        document.addEventListener('mousemove', function(e) {
-          mouseScreenX = e.clientX;
-          mouseScreenY = e.clientY;
-        });
-        rafId = requestAnimationFrame(tick);
-      }
-    }, 250);
+    setTimeout(runInitButtons, 1200);
   });
 })();
 
-// ========== 알림 모달: 열기/닫기 (Enter 버튼 클릭 시 화면 중앙에 표시) ==========
 (function() {
   function getOverlay() { return document.getElementById('alert-modal-overlay'); }
   function getCloseBtn() { return document.getElementById('alert-modal-close'); }
@@ -274,6 +279,5 @@
         closeAlertModal();
       }
     });
-    // Enter 버튼 클릭은 script.js initButtons()에서 각 버튼에 직접 리스너 등록
   });
 })();

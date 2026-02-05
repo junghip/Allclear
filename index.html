@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BYJF6QJKVR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BYJF6QJKVR');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>::이화여자대학교 수강신청 시스템::</title>
+  <title>::이화여자대학교 수강신청 시스템(Fake)::</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="style.css">
-  <!-- 첫 화면 품질 개선: list/background 미리 로드 -->
   <link rel="preload" href="list.png" as="image">
   <link rel="preload" href="background.png?v=2" as="image">
 </head>
 <body>
-  <!-- 1920×1080 고정: back(배경만 스케일) → list는 화면 픽셀로 그려서 항상 선명 → front(나머지 스케일) -->
   <div id="design-viewport-back" class="design-viewport-scaled">
     <div class="design-bg" aria-hidden="true"></div>
   </div>
@@ -34,7 +40,6 @@
     </div>
     <div class="content"></div>
 
-    <!-- 알림 모달: design-viewport 안에 두어 스케일 적용 → 로컬/배포 동일 크기 -->
     <div class="modal-overlay is-hidden" id="alert-modal-overlay" role="dialog" aria-labelledby="alert-modal-title" aria-modal="true">
       <div class="modal">
         <div class="modal-header">

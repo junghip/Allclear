@@ -5,17 +5,11 @@
   <title>Popup</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
-    /* popup.png 원본이 1004 x 768이라고 가정
-       너비만 정하고, 높이는 자동 비율 유지 */
     :root {
-      /* 원본 너비 */
       --popup-base-width: 1004px;
-      /* 배율만 바꿔서 크기 조절 (1 = 원본, 0.25 = 25% 등) */
       --popup-scale: 0.75;
-      /* 실제 적용될 너비 */
       --popup-width: calc(var(--popup-base-width) * var(--popup-scale));
     }
-    /* 화면 전체를 덮는 레이어(배경 없음, 팝업만 중앙 정렬) */
     .popup-overlay {
       position: fixed;
       inset: 0;
@@ -23,12 +17,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      /* 나중에 JS로 토글하기 쉽게 처음엔 보이도록 */
       visibility: visible;
       opacity: 1;
     }
 
-    /* 실제 팝업 박스 */
     .popup {
       position: relative;
       display: inline-block;
@@ -37,17 +29,15 @@
       overflow: hidden;
     }
 
-    /* 배경 이미지 역할을 하는 실제 이미지 */
     .popup-image {
       display: block;
-      width: var(--popup-width); /* 너비만 고정 */
-      height: auto;              /* 높이는 비율대로 자동 */
+      width: var(--popup-width);
+      height: auto;
     }
 
     body {
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
-    /* 팝업 안에 내용 넣을 영역 – 링크 클릭 가능하도록 pointer-events: auto */
     .popup-content {
       position: absolute;
       inset: 0;
@@ -83,7 +73,6 @@
       letter-spacing: -5.225px;
       margin-bottom: 10px;
     }
-    /* 50초~59초 구간에서만 적용: 깜빡임 */
     #korea-time.korea-time-blink {
       animation: korea-time-blink 1s ease-in-out infinite;
     }
@@ -98,14 +87,12 @@
         letter-spacing: -0.32px;
         display: flex;
         flex-direction: column;
-        gap: 10px; /* <p> 사이 간격 – 이 값만 바꾸면 됨 */
+        gap: 10px;
     }
-    /* 브라우저 기본 <p> 마진 제거해서 간격이 예측 가능하게 */
     .popup-content p,
     #post-list p {
       margin: 0;
     }
-    /* 하이퍼링크: 굵기 600, 색상 #1346FF, 클릭 시 새 탭에서 열림 */
     .popup-content a {
       color: #1346FF;
       font-weight: 600;
@@ -115,13 +102,11 @@
   </style>
 </head>
 <body>
-  <!-- 나중에 다른 페이지 위에 그대로 얹어서 사용할 수 있는 구조 -->
   <div class="popup-overlay">
     <div class="popup">
       <img src="popup.png" alt="" class="popup-image" />
       <div class="popup-content">
         <h1 id="popup-title">수강신청 성공기원! 올클은 나의 것</h1>
-        <!-- 링크는 target="_blank"로 새 탭에서 열립니다. -->
         <p id="server-time">
           이대수신화이팅(
           <a href="https://sugang.ewha.ac.kr"
@@ -135,12 +120,9 @@
         <p id="korea-time">한국 시간 불러오는 중...</p>
         <script>
           function updateKoreaTime() {
-            // 한국시간으로 현재 시간 생성
             const date = new Date();
-            // UTC+9 오프셋 적용 (한국 표준시)
-            const koreaOffset = 9 * 60; // 분 단위
-            const localOffset = date.getTimezoneOffset(); // 분 단위(서명)
-            // Date는 로컬, offset보정하여 한국시간 new Date(...)
+            const koreaOffset = 9 * 60;
+            const localOffset = date.getTimezoneOffset();
             const koreaTime = new Date(date.getTime() + (koreaOffset + localOffset) * 60000);
 
             const pad = n => n.toString().padStart(2, "0");
@@ -177,8 +159,6 @@
               먹고싶다 (2)
             </p>
         </div>
-  
-        <!-- 여기 안에 제목/텍스트/버튼 등을 채우면 됨 -->
       </div>
     </div>
   </div>

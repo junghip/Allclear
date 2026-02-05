@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>알림 모달</title>
   <style>
-    /* ========== 알림 모달 스타일 (다른 파일에 합칠 때 이 블록만 복사) ========== */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -124,11 +123,9 @@
     .modal-confirm:active {
       background: #1a7269;
     }
-    /* ========== 알림 모달 스타일 끝 ========== */
   </style>
 </head>
 <body>
-  <!-- ========== 알림 모달 HTML (다른 파일에 합칠 때 이 블록만 복사, body 끝나기 직전에 넣기) ========== -->
   <div class="modal-overlay is-hidden" id="alert-modal-overlay" role="dialog" aria-labelledby="alert-modal-title" aria-modal="true">
     <div class="modal">
       <div class="modal-header">
@@ -151,9 +148,7 @@
       </div>
     </div>
   </div>
-  <!-- ========== 알림 모달 HTML 끝 ========== -->
 
-  <!-- ========== 알림 모달 스크립트 (다른 파일에 합칠 때 이 블록만 복사) ========== -->
   <script>
   (function () {
     var overlay = document.getElementById("alert-modal-overlay");
@@ -183,6 +178,5 @@
     window.closeAlertModal = closeAlertModal;
   })();
   </script>
-  <!-- ========== 알림 모달 스크립트 끝 ========== -->
 </body>
 </html>

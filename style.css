@@ -4,7 +4,6 @@
   box-sizing: border-box;
 }
 
-/* 1920×1080 고정, 스케일만 적용 (back=배경, front=팝업·버튼·모달) */
 .design-viewport-scaled {
   position: fixed;
   left: 50%;
@@ -26,7 +25,6 @@
   pointer-events: auto;
 }
 
-/* list.png: 스케일 밖에서 화면 픽셀 그대로 → 고해상도 레이어로 첫 프레임부터 선명 (JS에서 left/top/width/height 설정) */
 .list-image-screen {
   position: fixed;
   z-index: 1;
@@ -70,7 +68,6 @@ body {
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
-/* popup: 1920×1080 내 고정 px – 버튼 레이어보다 위에 두어 링크 클릭 가능 */
 .popup-frame-wrapper {
   position: absolute;
   top: 24px;
@@ -90,7 +87,6 @@ body {
   pointer-events: auto;
 }
 
-/* Enter 버튼 레이어: 1920×1080 전체, 팝업 아래 레이어 (팝업 영역 클릭은 링크로) */
 .enter-buttons-layer {
   position: absolute;
   left: 0;
@@ -111,7 +107,6 @@ a {
   text-decoration: underline;
 }
 
-/* Container: 1920×1080 기준 px, script에서 --list-* 설정 */
 .table-container {
   position: absolute;
   left: var(--list-left, 0);
@@ -121,8 +116,6 @@ a {
   z-index: 1;
 }
 
-/* Enter button: SVG 참고 (66.5×33.67, rx 6.73447, #1EA5B7), Pretendard */
-/* 7 rows: 버튼 간 간격 12.2%. 첫 번째 고정, 나머지 동일 left */
 .enter-btn {
   position: absolute;
   left: 2.6%;
@@ -144,7 +137,6 @@ a {
   cursor: pointer;
 }
 
-/* 살짝이라도 닿으면 hover 인식되도록 히트 영역 확대 (보이지 않는 영역) */
 .enter-btn::before {
   content: '';
   position: absolute;
@@ -157,7 +149,6 @@ a {
   background: #72CB23 !important;
 }
 
-/* Rows 2–7: 같은 가로 위치, 세로 간격 12.2% (1번은 기본 16.84%) */
 .enter-btn:nth-child(2) { top: 29.04%; }
 .enter-btn:nth-child(3) { top: 41.24%; }
 .enter-btn:nth-child(4) { top: 53.44%; }
@@ -175,7 +166,6 @@ a {
   pointer-events: none;
 }
 
-/* ========== 알림 모달 (1920×1080 내 절대 위치, design-viewport와 함께 스케일 → 로컬/배포 동일) ========== */
 .modal-overlay {
   position: absolute;
   left: 0;
