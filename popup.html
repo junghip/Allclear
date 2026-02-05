@@ -47,7 +47,7 @@
     body {
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
-    /* 팝업 안에 내용 넣을 영역(필요하면 사용) */
+    /* 팝업 안에 내용 넣을 영역 – 링크 클릭 가능하도록 pointer-events: auto */
     .popup-content {
       position: absolute;
       inset: 0;
@@ -57,7 +57,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      pointer-events: none; /* 필요하면 제거해서 클릭 가능하게 */
+      pointer-events: auto;
     }
     #popup-title {
       font-size: 24px;
@@ -105,12 +105,12 @@
     #post-list p {
       margin: 0;
     }
-    /* 하이퍼링크: 굵기 600, 색상 #1346FF */
+    /* 하이퍼링크: 굵기 600, 색상 #1346FF, 클릭 시 새 탭에서 열림 */
     .popup-content a {
       color: #1346FF;
       font-weight: 600;
       text-decoration: underline;
-      pointer-events: auto;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -121,8 +121,7 @@
       <img src="popup.png" alt="" class="popup-image" />
       <div class="popup-content">
         <h1 id="popup-title">수강신청 성공기원! 올클은 나의 것</h1>
-        <!-- popup-content의 pointer-events: none 때문에 클릭이 비활성화됨.
-             클릭 가능한 영역만 pointer-events: auto로 되돌려줍니다. -->
+        <!-- 링크는 target="_blank"로 새 탭에서 열립니다. -->
         <p id="server-time">
           이대수신화이팅(
           <a href="https://sugang.ewha.ac.kr"
@@ -170,7 +169,13 @@
             <p>수신성공하면 나에게 두쫀쿠를 선물할테다 (98)</p>
             <p>졸업시켜줘 취업시켜줘 돈벌어줘 (97)</p>
             <p>인생여전 (86)</p>
-            <p>아웃닭먹고싶다 (2)</p>
+            <p>
+              아웃
+              <a href="https://www.instagram.com/hey.dagdak/" target="_blank" rel="noopener noreferrer" style="color: #000000; text-decoration: underline;">
+                다그닭
+              </a>
+              먹고싶다 (2)
+            </p>
         </div>
   
         <!-- 여기 안에 제목/텍스트/버튼 등을 채우면 됨 -->

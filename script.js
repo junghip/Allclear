@@ -25,7 +25,7 @@
 // 배경 이미지 기준 list 위치·크기 (1920×1080 고정 px)
 (function() {
   var bgImg = new Image();
-  bgImg.src = 'background.png';
+  bgImg.src = 'background.png?v=2';
   var DESIGN_W = 1920;
   var DESIGN_H = 1080;
 
@@ -173,6 +173,9 @@
       btn.style.right = 'auto';
       btn.style.bottom = 'auto';
       btn.style.pointerEvents = 'auto';
+      btn.addEventListener('click', function() {
+        if (window.showAlertModal) window.showAlertModal();
+      });
     }
   }
 
@@ -271,12 +274,6 @@
         closeAlertModal();
       }
     });
-    // 모든 Enter 버튼 클릭 시 모달 열기 (이벤트 위임: 레이어·버튼 이동 후에도 동작)
-    document.addEventListener('click', function(e) {
-      var target = e.target && (e.target.closest ? e.target.closest('.enter-btn') : e.target);
-      if (target && target.classList && target.classList.contains('enter-btn')) {
-        showAlertModal();
-      }
-    });
+    // Enter 버튼 클릭은 script.js initButtons()에서 각 버튼에 직접 리스너 등록
   });
 })();
